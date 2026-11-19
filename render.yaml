@@ -1,0 +1,34 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# Creates the web service. The MySQL database is hosted separately (see docs/DEPLOYMENT.md).
+services:
+  - type: web
+    name: xfactor-uk-db
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 "xfactor.web:create_app()"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        value: xfactor
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_READONLY_USER
+        sync: false
+      - key: DB_READONLY_PASSWORD
+        sync: false
+      - key: DB_SSL_CA
+        value: /etc/secrets/ca.pem
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: EDIT_PASSWORD
+        sync: false
+      - key: FLASK_SECRET_KEY
+        generateValue: true

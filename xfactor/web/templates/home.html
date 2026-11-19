@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import result_table %}
+{% block content %}
+<section class="hero">
+  <h1>The X Factor (UK) database</h1>
+  <p>15 series, 2004–2018 · <strong>{{ "{:,}".format(total) }}</strong> rows across {{ counts|length }} tables,
+     scraped from Wikipedia and loaded through SQLAlchemy into MySQL.</p>
+  <div class="actions">
+    <a class="btn" href="{{ url_for('ask.ask_page') }}">Ask a question in plain English</a>
+    <a class="btn ghost" href="{{ url_for('tables.list_rows', table='act') }}">Browse acts</a>
+  </div>
+</section>
+
+<h2>Tables</h2>
+<div class="tiles">
+  {% for name, count in counts|dictsort %}
+  <a class="tile" href="{{ url_for('tables.list_rows', table=name) }}">
+    <span class="count">{{ "{:,}".format(count) }}</span><span class="name">{{ name }}</span>
+  </a>
+  {% endfor %}
+</div>
+
+<h2>Series at a glance <small>(VIEW v_series_summary)</small></h2>
+{{ result_table(summary) }}
+{% endblock %}

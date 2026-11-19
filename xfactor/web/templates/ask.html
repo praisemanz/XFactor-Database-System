@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Ask the database ✨</h1>
+<p class="muted">Claude turns your question into SQL, the query runs read-only against this database,
+   and the answer is written only from the rows that come back.</p>
+{% if not configured %}
+  <div class="flash error">Set <code>ANTHROPIC_API_KEY</code> in <code>.env</code> and restart the app to enable this page.</div>
+{% endif %}
+<form class="ask-form" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input name="question" value="{{ question }}" placeholder="e.g. Which mentor has won the most series?" maxlength="500" autofocus>
+  <button class="btn" {% if not configured %}disabled{% endif %}>Ask</button>
+</form>
+<div class="chips">
+  {% for q in examples %}<a class="chip" href="{{ url_for('ask.ask_page', q=q) }}">{{ q }}</a>{% endfor %}
+</div>
+
+{% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+{% if answer %}
+  <section class="answer">
+    <h2>Answer</h2>
+    <p>{{ answer.answer }}</p>
+    {% if answer.error %}<p class="flash error">{{ answer.error }}</p>{% endif %}
+  </section>
+  {% if answer.sql %}
+  <details open>
+    <summary>Generated SQL <span class="muted">— {{ answer.explanation }}</span></summary>
+    <pre><code>{{ answer.sql }}</code></pre>
+  </details>
+  {% endif %}
+  {% if answer.rows %}
+  <details>
+    <summary>Query results ({{ answer.rows|length }} rows)</summary>
+    <div class="scroll"><table>
+      <thead><tr>{% for c in answer.columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+      <tbody>{% for r in answer.rows %}<tr>{% for v in r %}<td>{{ '' if v is none else v }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+    </table></div>
+  </details>
+  {% endif %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% from "_macros.html" import result_table %}
+{% block content %}
+<h1>Stored procedures</h1>
+<div class="cards">
+  <form class="card" method="get">
+    <h3>sp_series_leaderboard</h3>
+    <p class="muted">Final standings for one series.</p>
+    <input type="hidden" name="proc" value="leaderboard">
+    <input name="series" type="number" min="1" max="15" value="{{ form.get('series', 7) }}">
+    <button class="btn">CALL</button>
+  </form>
+  <form class="card" method="get">
+    <h3>sp_act_journey</h3>
+    <p class="muted">Every song an act sang, week by week.</p>
+    <input type="hidden" name="proc" value="journey">
+    <input name="act" value="{{ form.get('act', 'One Direction') }}">
+    <button class="btn">CALL</button>
+  </form>
+  <form class="card" method="post">
+    <h3>sp_record_showdown_result</h3>
+    <p class="muted">Write procedure: sets a result; returns rows changed via an OUT parameter.</p>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="proc" value="showdown">
+    <input name="series" type="number" value="6" title="series">
+    <input name="week" type="number" value="1" title="week">
+    <input name="act" value="Kandy Rain" title="act name (exact)">
+    <input name="result" value="Eliminated" title="new result">
+    <button class="btn" {% if not can_edit %}disabled title="Log in to run"{% endif %}>CALL</button>
+  </form>
+</div>
+{% if title %}<h2><code>{{ title }}</code></h2>{% endif %}
+{{ result_table(table) }}
+{% endblock %}

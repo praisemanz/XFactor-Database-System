@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ table }} · X Factor UK DB{% endblock %}
+{% block content %}
+<div class="row-between">
+  <h1>{{ table }} <small>{{ "{:,}".format(total) }} rows</small></h1>
+  {% if can_edit %}<a class="btn" href="{{ url_for('tables.create_row', table=table) }}">+ New row</a>{% endif %}
+</div>
+<form class="search" method="get">
+  <input name="q" value="{{ search }}" placeholder="Search text columns…">
+  <button>Search</button>
+  {% if search %}<a href="{{ url_for('tables.list_rows', table=table) }}">clear</a>{% endif %}
+</form>
+<div class="scroll">
+<table>
+  <thead><tr>
+    {% for c in columns %}<th>{{ c.name }}{% if c.primary_key %} 🔑{% endif %}{% if c.foreign_table %} <small>→ {{ c.foreign_table }}</small>{% endif %}</th>{% endfor %}
+    {% if can_edit %}<th></th>{% endif %}
+  </tr></thead>
+  <tbody>
+  {% for pk, values in rows %}
+    <tr>
+      {% for c, v in zip(columns, values) %}
+        <td>{% if c.foreign_table and v is not none %}<a href="{{ url_for('tables.list_rows', table=c.foreign_table) }}">{{ v }}</a>{% else %}{{ '' if v is none else v }}{% endif %}</td>
+      {% endfor %}
+      {% if can_edit %}
+      <td class="row-actions">
+        <a href="{{ url_for('tables.edit_row', table=table, pk=pk) }}">Edit</a>
+        <form method="post" action="{{ url_for('tables.delete_row', table=table, pk=pk) }}" onsubmit="return confirm('Delete {{ table }} #{{ pk }}? Related rows may be deleted too.');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="link danger">Delete</button>
+        </form>
+      </td>
+      {% endif %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<nav class="pager">
+  {% if page > 1 %}<a href="?q={{ search|urlencode }}&page={{ page-1 }}">← Prev</a>{% endif %}
+  <span>Page {{ page }} of {{ pages }}</span>
+  {% if page < pages %}<a href="?q={{ search|urlencode }}&page={{ page+1 }}">Next →</a>{% endif %}
+</nav>
+{% endblock %}

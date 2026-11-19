@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}X Factor UK Database{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="{{ url_for('reports.home') }}"><span>X</span> Factor UK DB</a>
+  <nav>
+    <a href="{{ url_for('reports.home') }}">Home</a>
+    <details class="menu">
+      <summary>Tables</summary>
+      <div class="menu-list">
+        {% for t in table_names %}<a href="{{ url_for('tables.list_rows', table=t) }}">{{ t }}</a>{% endfor %}
+      </div>
+    </details>
+    <details class="menu">
+      <summary>Views</summary>
+      <div class="menu-list">
+        <a href="{{ url_for('reports.view', name='v_series_summary') }}">v_series_summary</a>
+        <a href="{{ url_for('reports.view', name='v_performance_detail') }}">v_performance_detail</a>
+        <a href="{{ url_for('reports.view', name='v_mentor_stats') }}">v_mentor_stats</a>
+      </div>
+    </details>
+    <a href="{{ url_for('reports.procedures') }}">Procedures</a>
+    <a href="{{ url_for('reports.mentor_songs') }}">Join query</a>
+    <a class="ask" href="{{ url_for('ask.ask_page') }}">Ask ✨</a>
+    {% if not can_edit %}<a href="{{ url_for('tables.login') }}">Log in</a>{% endif %}
+  </nav>
+</header>
+<main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<footer>Data: Wikipedia, <em>The X Factor (British TV series)</em> and its series and discography articles (CC BY-SA 4.0).</footer>
+</body>
+</html>

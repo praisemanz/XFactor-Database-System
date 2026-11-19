@@ -1,0 +1,17 @@
+{% macro result_table(table) -%}
+{% if table and table.rows %}
+<div class="scroll">
+<table>
+  <thead><tr>{% for c in table.columns %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+  <tbody>
+  {% for row in table.rows %}
+    <tr>{% for v in row %}<td>{{ '' if v is none else v }}</td>{% endfor %}</tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="muted">{{ table.rows|length }} row(s)</p>
+{% elif table %}
+<p class="muted">No rows.</p>
+{% endif %}
+{%- endmacro %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Editor login</h1>
+<p class="muted">Reading is open to everyone; creating, editing and deleting rows needs the editor password.</p>
+<form class="form narrow" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <label><span>Password</span><input type="password" name="password" required autofocus></label>
+  <button class="btn">Log in</button>
+</form>
+{% endblock %}

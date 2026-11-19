@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ 'Edit' if pk else 'New' }} {{ table }}{% if pk %} <small>#{{ pk }}</small>{% endif %}</h1>
+<form class="form" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  {% for c in columns if not c.autoincrement %}
+    {% set value = values.get(c.name) %}
+    {% set locked = pk and c.primary_key %}
+    <label>
+      <span>{{ c.name }}{% if not c.nullable and c.kind != 'bool' %} *{% endif %}
+        {% if c.foreign_table %}<small>→ {{ c.foreign_table }}</small>{% endif %}</span>
+      {% if c.kind == 'bool' %}
+        <input type="checkbox" name="{{ c.name }}" {% if value in (true, 'on', 'true', '1', 1) %}checked{% endif %} {% if locked %}disabled{% endif %}>
+      {% elif c.name in fk_options %}
+        <select name="{{ c.name }}" {% if locked %}disabled{% endif %}>
+          {% if c.nullable %}<option value="">— none —</option>{% endif %}
+          {% for opt_value, label in fk_options[c.name] %}
+            <option value="{{ opt_value }}" {% if value is not none and value|string == opt_value|string %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      {% elif c.kind == 'choice' %}
+        <select name="{{ c.name }}" {% if locked %}disabled{% endif %}>
+          {% for opt in c.choices %}<option {% if value == opt %}selected{% endif %}>{{ opt }}</option>{% endfor %}
+        </select>
+      {% else %}
+        <input name="{{ c.name }}" value="{{ '' if value is none else value }}"
+          {% if c.kind == 'int' %}type="number"{% elif c.kind == 'float' %}type="number" step="0.01"{% elif c.kind == 'date' %}type="date"{% endif %}
+          {% if not c.nullable and not locked %}required{% endif %} {% if locked %}disabled{% endif %}>
+      {% endif %}
+    </label>
+  {% endfor %}
+  <div class="actions">
+    <button class="btn">Save</button>
+    <a href="{{ url_for('tables.list_rows', table=table) }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

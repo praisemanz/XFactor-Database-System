@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% from "_macros.html" import result_table %}
+{% block content %}
+<h1>Multi-join query</h1>
+<p class="muted">person → mentorship → category, series → series_act → act → performance → live_show → song (8 tables, built with the SQLAlchemy ORM).</p>
+<form class="search" method="get">
+  <input name="mentor" value="{{ mentor }}" placeholder="Mentor name, e.g. Cowell">
+  <button>Run</button>
+</form>
+{{ result_table(table) }}
+<h2>Most-performed songs <small>(aggregate join)</small></h2>
+{{ result_table(top) }}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% from "_macros.html" import result_table %}
+{% block content %}
+<h1>{{ title }}</h1>
+{% if view_name != 'v_mentor_stats' %}
+<form class="search" method="get">
+  <input name="series" type="number" min="1" max="15" value="{{ series or '' }}" placeholder="Filter by series #">
+  <button>Filter</button>
+</form>
+{% endif %}
+{{ result_table(table) }}
+{% endblock %}
